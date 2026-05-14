@@ -2,44 +2,127 @@ body {
   font-family: Arial, sans-serif;
   background: #fafafa;
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  transition: background 0.3s, color 0.3s;
+}
+
+body.dark {
+  background: #121212;
+  color: #e2e2e2;
 }
 
 .container {
   max-width: 800px;
   margin: auto;
+  padding: 16px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 1.6rem;
+}
+
+#videoCounter {
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 video {
   width: 100%;
-  max-width: 100%;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+/* Buttons */
+#controls {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
 }
 
 #controls button {
-  padding: 8px 14px;
-  margin: 8px;
-  font-size: 16px;
+  flex: 1;
+  margin: 0 5px;
+  padding: 12px;
+  font-size: 1.1rem;
+  border-radius: 8px;
 }
 
+/* Search Area */
 #searchArea {
-  margin-top: 10px;
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  align-items: center;
+}
+
+#searchArea input,
+#searchArea button {
+  flex: 1 1 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
 #multiLabel {
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Add question */
+.questionRow {
+  display: flex;
+  gap: 10px;
+}
+
+.questionRow input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.questionRow button {
+  padding: 12px;
+  border-radius: 8px;
+}
+
+/* Questions */
+ul {
+  padding-left: 20px;
 }
 
 .delete-btn {
   margin-left: 10px;
-  cursor: pointer;
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 20px;
+  cursor: pointer;
 }
 
-ul {
-  padding-left: 20px;
+/* Dark mode toggle */
+.floating-btn {
+  position: fixed;
+  right: 16px;
+  bottom: 20px;
+  padding: 12px 14px;
+  font-size: 22px;
+  border-radius: 50%;
+  background: #222;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* Mobile improvements */
+@media (min-width: 600px) {
+  #searchArea input {
+    flex: 2;
+  }
+  #searchArea button {
+    flex: none;
+    width: 80px;
+  }
+  #multiLabel {
+    flex: none;
+  }
 }

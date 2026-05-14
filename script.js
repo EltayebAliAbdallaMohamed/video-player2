@@ -1,11 +1,11 @@
 let data = [];
 let currentIndex = 0;
 
-// Multi-search state
-let filteredIndexes = null;   // null = normal mode; array = playlist mode
+// Multi-search mode
+let filteredIndexes = null;
 let filteredPosition = 0;
 
-// Fetch data.json and merge stored questions
+// Load data.json
 async function loadData() {
   try {
     const response = await fetch("data.json");
@@ -28,7 +28,7 @@ async function loadData() {
   }
 }
 
-// Display current video and questions
+// Render content
 function renderContent() {
   const contentDiv = document.getElementById("content");
   contentDiv.innerHTML = "";
@@ -36,12 +36,11 @@ function renderContent() {
   const item = data[currentIndex];
   if (!item) return;
 
-  // Correct counter for filtered mode
   if (filteredIndexes) {
-    document.getElementById("videoCounter").textContent =
+    videoCounter.textContent =
       `Video ${filteredPosition + 1} of ${filteredIndexes.length}`;
   } else {
-    document.getElementById("videoCounter").textContent =
+    videoCounter.textContent =
       `Video ${currentIndex + 1} of ${data.length}`;
   }
 
@@ -54,7 +53,6 @@ function renderContent() {
     video.src = item.video;
     video.controls = true;
     video.style.borderRadius = "10px";
-    video.style.marginBottom = "1rem";
     contentDiv.appendChild(video);
   }
 
@@ -62,20 +60,17 @@ function renderContent() {
   header.textContent = "Reflection Questions";
   contentDiv.appendChild(header);
 
-  const ul = document.createElement("ul");
-  ul.id = "questionList";
-
   if (!item.questions || item.questions.length === 0) {
     const p = document.createElement("p");
     p.textContent = "No questions yet. Add one below!";
     contentDiv.appendChild(p);
   } else {
+    const ul = document.createElement("ul");
     item.questions.forEach((q, idx) => {
       const li = document.createElement("li");
       li.textContent = q;
 
       const del = document.createElement("button");
-      del.type = "button";
       del.textContent = "🗑️";
       del.className = "delete-btn";
       del.addEventListener("click", () => deleteQuestion(idx));
@@ -83,30 +78,25 @@ function renderContent() {
       li.appendChild(del);
       ul.appendChild(li);
     });
-
     contentDiv.appendChild(ul);
   }
 
-  updateButtonStates();  // ← IMPORTANT NEW LINE
+  updateButtonStates();
 }
 
-// Enable/disable Prev/Next buttons
 function updateButtonStates() {
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
+  prevBtn.disabled = filteredIndexes
+    ? filteredPosition === 0
+    : currentIndex === 0;
 
-  if (filteredIndexes) {
-    prevBtn.disabled = filteredPosition === 0;
-    nextBtn.disabled = filteredPosition === filteredIndexes.length - 1;
-  } else {
-    prevBtn.disabled = currentIndex === 0;
-    nextBtn.disabled = currentIndex === data.length - 1;
-  }
+  nextBtn.disabled = filteredIndexes
+    ? filteredPosition === filteredIndexes.length - 1
+    : currentIndex === data.length - 1;
 }
 
-// Add a question
+// Add/Delete question
 function addQuestion() {
-  const input = document.getElementById("newQuestion");
+  const input = newQuestion;
   const q = input.value.trim();
   if (!q) return;
 
@@ -118,14 +108,13 @@ function addQuestion() {
   renderContent();
 }
 
-// Delete a question
 function deleteQuestion(i) {
   data[currentIndex].questions.splice(i, 1);
   saveQuestions();
   renderContent();
 }
 
-// NEXT button
+// Navigation
 function showNext() {
   if (filteredIndexes) {
     if (filteredPosition < filteredIndexes.length - 1) {
@@ -133,15 +122,12 @@ function showNext() {
       currentIndex = filteredIndexes[filteredPosition];
       renderContent();
     }
-  } else {
-    if (currentIndex < data.length - 1) {
-      currentIndex++;
-      renderContent();
-    }
+  } else if (currentIndex < data.length - 1) {
+    currentIndex++;
+    renderContent();
   }
 }
 
-// PREVIOUS button
 function showPrevious() {
   if (filteredIndexes) {
     if (filteredPosition > 0) {
@@ -149,117 +135,102 @@ function showPrevious() {
       currentIndex = filteredIndexes[filteredPosition];
       renderContent();
     }
-  } else {
-    if (currentIndex > 0) {
-      currentIndex--;
-      renderContent();
-    }
+  } else if (currentIndex > 0) {
+    currentIndex--;
+    renderContent();
   }
 }
 
-// Jump or multi-search
+// Search
 function goToVideo() {
-  const input = document.getElementById("videoSearch");
-  const multi = document.getElementById("multiSearch").checked;
-  const value = input.value.trim();
+  const value = videoSearch.value.trim();
+  const multi = multiSearch.checked;
 
-  // MULTI SEARCH
   if (multi) {
-    if (!value.includes(",")) {
-      alert("Enter numbers separated by commas: e.g., 2,4,7");
-      return;
-    }
+    if (!value.includes(",")) return alert("Use commas: 1,3,6");
+    const numbers = value.split(",").map(n => parseInt(n.trim(), 10));
+    const valid = numbers.filter(n => n >= 1 && n <= data.length);
 
-    const parts = value.split(",").map((n) => parseInt(n.trim(), 10));
-    const valid = parts.filter((n) => n >= 1 && n <= data.length);
+    if (!valid.length) return alert("No valid numbers.");
 
-    if (valid.length === 0) {
-      alert("No valid video numbers.");
-      return;
-    }
-
-    filteredIndexes = valid.map((v) => v - 1);
+    filteredIndexes = valid.map(v => v - 1);
     filteredPosition = 0;
-
     currentIndex = filteredIndexes[0];
-    renderContent();
-
-    input.value = "";
-    return;
+    videoSearch.value = "";
+    return renderContent();
   }
 
-  // SINGLE SEARCH
   const num = parseInt(value, 10);
-
   if (!num || num < 1 || num > data.length) {
-    alert(`Enter a valid number between 1 and ${data.length}`);
-    return;
+    return alert("Invalid number.");
   }
 
   filteredIndexes = null;
   filteredPosition = 0;
-
   currentIndex = num - 1;
+  videoSearch.value = "";
   renderContent();
-  input.value = "";
 }
 
-// Save questions to localStorage
+// Save questions
 function saveQuestions() {
-  const all = data.map((item) => item.questions || []);
+  const all = data.map(item => item.questions || []);
   localStorage.setItem("userQuestions", JSON.stringify(all));
 }
 
 // Event listeners
-document.getElementById("nextBtn").addEventListener("click", showNext);
-document.getElementById("prevBtn").addEventListener("click", showPrevious);
-document.getElementById("addQuestionBtn").addEventListener("click", addQuestion);
-document.getElementById("goBtn").addEventListener("click", goToVideo);
+nextBtn.addEventListener("click", showNext);
+prevBtn.addEventListener("click", showPrevious);
+addQuestionBtn.addEventListener("click", addQuestion);
+goBtn.addEventListener("click", goToVideo);
 
-// Initialize
-loadData();
+// Swipe gesture support
+let startX = 0;
 
-/* ------------------------------------------
-   KEYBOARD SHORTCUTS (ONLY NEW ADDITIONS)
-------------------------------------------- */
+document.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", e => {
+  const dx = e.changedTouches[0].clientX - startX;
+
+  if (Math.abs(dx) > 60) {
+    if (dx < 0) showNext();
+    else showPrevious();
+  }
+});
+
+// Keyboard shortcuts
 document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") showNext();
+  if (e.key === "ArrowLeft") showPrevious();
 
-  // Right arrow → Next
-  if (e.key === "ArrowRight") {
-    e.preventDefault();
-    showNext();
+  if (e.key === "Enter" && document.activeElement.id === "videoSearch") {
+    goToVideo();
   }
 
-  // Left arrow → Previous
-  if (e.key === "ArrowLeft") {
-    e.preventDefault();
-    showPrevious();
-  }
-
-  // Enter → Search (Go button)
-  if (e.key === "Enter") {
-    if (document.activeElement.id === "videoSearch") {
-      goToVideo();
-    }
-  }
-
-  // Ctrl + Delete → Delete last question
   if (e.ctrlKey && e.key === "Backspace") {
     const item = data[currentIndex];
-    if (item.questions && item.questions.length > 0) {
+    if (item.questions?.length) {
       item.questions.pop();
       saveQuestions();
       renderContent();
     }
   }
 
-  // Ctrl + N → Focus add-question field
   if (e.ctrlKey && e.key.toLowerCase() === "n") {
-    document.getElementById("newQuestion").focus();
+    newQuestion.focus();
   }
 
-  // Ctrl + G → Focus search box
   if (e.ctrlKey && e.key.toLowerCase() === "g") {
-    document.getElementById("videoSearch").focus();
+    videoSearch.focus();
   }
 });
+
+// Dark mode toggle
+darkModeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+});
+
+// Start
+loadData();
