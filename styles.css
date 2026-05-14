@@ -1,0 +1,45 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #fafafa;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+video {
+  width: 100%;
+  max-width: 100%;
+}
+
+#controls button {
+  padding: 8px 14px;
+  margin: 8px;
+  font-size: 16px;
+}
+
+#searchArea {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#multiLabel {
+  font-size: 14px;
+}
+
+.delete-btn {
+  margin-left: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 18px;
+}
+
+ul {
+  padding-left: 20px;
+}

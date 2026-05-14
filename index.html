@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Video Reflection App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>Video Viewer</h1>
+    <p id="videoCounter"></p>
+
+    <div id="content"></div>
+
+    <div id="controls">
+      <button id="prevBtn">Previous</button>
+      <button id="nextBtn">Next</button>
+    </div>
+
+    <hr>
+
+    <!-- Search Section -->
+    <div id="searchArea">
+      <input type="text" id="videoSearch" placeholder="Enter video # or 1,3,6">
+
+      <label id="multiLabel">
+        <input type="checkbox" id="multiSearch">
+        Multi-search (comma-separated)
+      </label>
+
+      <button id="goBtn">Go</button>
+    </div>
+
+    <hr>
+
+    <!-- Add Question -->
+    <h3>Add New Question</h3>
+    <input type="text" id="newQuestion" placeholder="Type your question">
+    <button id="addQuestionBtn">Add Question</button>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
