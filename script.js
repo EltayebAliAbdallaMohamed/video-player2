@@ -86,6 +86,22 @@ function renderContent() {
 
     contentDiv.appendChild(ul);
   }
+
+  updateButtonStates();  // ← IMPORTANT NEW LINE
+}
+
+// Enable/disable Prev/Next buttons
+function updateButtonStates() {
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  if (filteredIndexes) {
+    prevBtn.disabled = filteredPosition === 0;
+    nextBtn.disabled = filteredPosition === filteredIndexes.length - 1;
+  } else {
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === data.length - 1;
+  }
 }
 
 // Add a question
